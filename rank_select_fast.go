@@ -1,18 +1,60 @@
 package gorasp
 
+import (
+	"math/bits"
+)
+
 type RankSelectFast struct {
-	packedArray  []int64
-	partialRanks []int64
+	packedArray  []uint64
+	partialRanks []uint
+	n            int
 }
 
-func setBit(array []int64, index, value int) {
+func (self *RankSelectFast) rankOfIndex(index int) uint {
+	partialRank := self.partialRanks[index/64]
+
+	if index%64 == 0 {
+		return partialRank
+	}
+
+	word := self.packedArray[index/64]
+
+	mask := uint64(1) << (uint(index % 64))
+	mask = mask - 1
+	return partialRank + uint(bits.OnesCount64(word&mask))
+}
+
+func (self *RankSelectFast) computePartialRanks() {
+	self.partialRanks = make([]uint, computePackedLength(self.n))
+	sum := uint(0)
+	for i := 0; i < self.n; i += 1 {
+		if i%64 == 0 {
+			self.partialRanks[i/64] = sum
+		}
+		bitValue := getBit(self.packedArray, i)
+		sum += bitValue
+	}
+}
+
+func getBit(array []uint64, index int) uint {
 	wordIndex := index / 64
 	bitIndex := index % 64
 
 	word := array[wordIndex]
-	mask := int64(1) << uint(bitIndex)
+	mask := uint64(1) << uint(bitIndex)
+
+	val := uint((word & mask) >> uint(bitIndex))
+	return val
+}
+
+func setBit(array []uint64, index, value int) {
+	wordIndex := index / 64
+	bitIndex := index % 64
+
+	word := array[wordIndex]
+	mask := uint64(1) << uint(bitIndex)
 	if value == 0 {
-		mask = mask ^ 0
+		mask = ^uint64(0) ^ mask
 		word = word & mask
 	} else {
 		word = word | mask
@@ -22,18 +64,20 @@ func setBit(array []int64, index, value int) {
 
 func NewRankSelectFast(array []int) *RankSelectFast {
 	result := new(RankSelectFast)
-	packedArrayLength := computePackedLength(array)
-	packedArray := make([]int64, packedArrayLength)
+	packedArrayLength := computePackedLength(len(array))
+	packedArray := make([]uint64, packedArrayLength)
 	for index, bitValue := range array {
 		setBit(packedArray, index, bitValue)
 	}
 	result.packedArray = packedArray
+	result.n = len(array)
+	result.computePartialRanks()
 	return result
 }
 
-func computePackedLength(array []int) int {
-	if len(array) == 0 {
+func computePackedLength(n int) int {
+	if n == 0 {
 		return 0
 	}
-	return (len(array)-1)/64 + 1
+	return (n-1)/64 + 1
 }
