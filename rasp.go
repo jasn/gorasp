@@ -5,7 +5,7 @@ import (
 )
 
 func printAThing(v RankSelect) {
-	val := v.rankOfIndex(2)
+	val := v.RankOfIndex(2)
 	fmt.Println(val)
 }
 
@@ -15,5 +15,5 @@ func main() {
 	val := NewRankSelectSimple([]int{0, 0, 1, 0, 1, 1, 0})
 	printAThing(val)
 	fmt.Println(val)
-	fmt.Println(val.rankOfIndex(1))
+	fmt.Println(val.RankOfIndex(1))
 }

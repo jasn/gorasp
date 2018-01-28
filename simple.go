@@ -10,7 +10,7 @@ func NewRankSelectSimple(array []int) *RankSelectSimple {
 	return obj
 }
 
-func (s *RankSelectSimple) rankOfIndex(index int) uint {
+func (s *RankSelectSimple) RankOfIndex(index int) uint {
 	var result = 0
 	for _, val := range s.array[:index] {
 		result += val
@@ -18,7 +18,7 @@ func (s *RankSelectSimple) rankOfIndex(index int) uint {
 	return uint(result)
 }
 
-func (s *RankSelectSimple) index_with_rank(rank int) int {
+func (s *RankSelectSimple) IndexWithRank(rank int) int {
 	var count = 0
 	for i, val := range s.array {
 		if count == rank {

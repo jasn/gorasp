@@ -8,13 +8,13 @@ import (
 func TestEmpty(t *testing.T) {
 	data := []int{}
 	dataStructure := NewRankSelectSimple(data)
-	val := dataStructure.rankOfIndex(0)
+	val := dataStructure.RankOfIndex(0)
 
 	if val != 0 {
 		t.Fail()
 	}
 
-	val2 := dataStructure.index_with_rank(0)
+	val2 := dataStructure.IndexWithRank(0)
 
 	if val2 != 0 {
 		t.Fail()
@@ -25,8 +25,8 @@ func TestOnlyOnes(t *testing.T) {
 	data := []int{1, 1, 1, 1, 1, 1}
 	dataStructure := NewRankSelectSimple(data)
 	for index, _ := range data {
-		query_rank := dataStructure.rankOfIndex(index)
-		query_index := dataStructure.index_with_rank(index)
+		query_rank := dataStructure.RankOfIndex(index)
+		query_index := dataStructure.IndexWithRank(index)
 		if query_rank != uint(index) {
 			t.Fail()
 			fmt.Printf("Query Rank: expected %d received %d\n", index, query_rank)

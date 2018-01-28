@@ -26,11 +26,11 @@ func TestRankOfIndexSimpleFastAgreeSingleWord(t *testing.T) {
 	simple := NewRankSelectSimple(array)
 
 	for i, _ := range array {
-		rankFast := fast.rankOfIndex(i)
-		rankSimple := simple.rankOfIndex(i)
+		rankFast := fast.RankOfIndex(i)
+		rankSimple := simple.RankOfIndex(i)
 		if rankFast != rankSimple {
 			fmt.Println("Fast differs from Simple")
-			fmt.Printf("fast.rankOfIndex(%d) = %d while slow.rankOfindex(%d) = %d",
+			fmt.Printf("fast.RankOfIndex(%d) = %d while slow.RankOfIndex(%d) = %d",
 				i, rankFast, i, rankSimple)
 			fmt.Println()
 			t.Fail()
@@ -48,11 +48,11 @@ func TestRankOfIndexSimpleFastAgreeMultipleWords(t *testing.T) {
 	simple := NewRankSelectSimple(array)
 
 	for i, _ := range array {
-		rankFast := fast.rankOfIndex(i)
-		rankSimple := simple.rankOfIndex(i)
+		rankFast := fast.RankOfIndex(i)
+		rankSimple := simple.RankOfIndex(i)
 		if rankFast != rankSimple {
 			fmt.Println("Fast differs from Simple")
-			fmt.Printf("fast.rankOfIndex(%d) = %d while slow.rankOfindex(%d) = %d",
+			fmt.Printf("fast.RankOfIndex(%d) = %d while slow.RankOfIndex(%d) = %d",
 				i, rankFast, i, rankSimple)
 			fmt.Println()
 			t.Fail()

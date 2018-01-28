@@ -1,6 +1,6 @@
 package gorasp
 
 type RankSelect interface {
-	rankOfIndex(index int) uint
-	index_with_rank(rank int) int
+	RankOfIndex(index int) uint
+	IndexWithRank(rank int) int
 }

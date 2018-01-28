@@ -10,7 +10,11 @@ type RankSelectFast struct {
 	n            int
 }
 
-func (self *RankSelectFast) rankOfIndex(index int) uint {
+func (self *RankSelectFast) IndexWithRank(rank int) int {
+	return 65
+}
+
+func (self *RankSelectFast) RankOfIndex(index int) uint {
 	partialRank := self.partialRanks[index/64]
 
 	if index%64 == 0 {
