@@ -15,7 +15,27 @@ func (self *RankSelectFast) IndexWithRank(rank int) int {
 }
 
 func (self *RankSelectFast) computePartialSelects() {
+	selects := make([]uint, self.n+1)
+	sum := uint(0)
+	for i, v := range self.packedArray {
+		if v == 1 {
+			selects[sum] = i + 1
+		}
+		sum += v
+	}
+	for i := sum; i < len(selects); i += 1 {
+		selects[i] = selects[sum]
+	}
 
+	for i, v := range selects[1:] {
+		vPrev := selects[i-1]
+		currBlock := v / 64
+		prevBlock := vPrev / 64
+
+		if currBlock != prevBlock {
+
+		}
+	}
 }
 
 func (self *RankSelectFast) RankOfIndex(index int) uint {
