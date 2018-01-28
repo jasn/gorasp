@@ -11,7 +11,11 @@ type RankSelectFast struct {
 }
 
 func (self *RankSelectFast) IndexWithRank(rank int) int {
-	return 65
+	return 0
+}
+
+func (self *RankSelectFast) computePartialSelects() {
+
 }
 
 func (self *RankSelectFast) RankOfIndex(index int) uint {
