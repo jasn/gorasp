@@ -10,12 +10,12 @@ func NewRankSelectSimple(array []int) *RankSelectSimple {
 	return obj
 }
 
-func (s *RankSelectSimple) rank_of_index(index int) int {
+func (s *RankSelectSimple) rankOfIndex(index int) uint {
 	var result = 0
 	for _, val := range s.array[:index] {
 		result += val
 	}
-	return result
+	return uint(result)
 }
 
 func (s *RankSelectSimple) index_with_rank(rank int) int {
