@@ -4,11 +4,6 @@ import (
 	"fmt"
 )
 
-type RankSelect interface {
-	rank_of_index(index int) int
-	index_with_rank(rank int) int
-}
-
 func printAThing(v RankSelect) {
 	val := v.rank_of_index(2)
 	fmt.Println(val)
