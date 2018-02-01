@@ -14,7 +14,7 @@ func TestEmpty(t *testing.T) {
 		t.Fail()
 	}
 
-	val2 := dataStructure.IndexWithRank(0)
+	val2, _ := dataStructure.IndexWithRank(0)
 
 	if val2 != 0 {
 		t.Fail()
@@ -26,7 +26,7 @@ func TestOnlyOnes(t *testing.T) {
 	dataStructure := NewRankSelectSimple(data)
 	for index, _ := range data {
 		query_rank := dataStructure.RankOfIndex(index)
-		query_index := dataStructure.IndexWithRank(index)
+		query_index, _ := dataStructure.IndexWithRank(index)
 		if query_rank != uint(index) {
 			t.Fail()
 			fmt.Printf("Query Rank: expected %d received %d\n", index, query_rank)
@@ -36,4 +36,33 @@ func TestOnlyOnes(t *testing.T) {
 			fmt.Printf("Query Index: expected %d received %d\n", index, query_index)
 		}
 	}
+}
+
+func TestRankAndIndexOfLast(t *testing.T) {
+	data := []int{0, 1, 0, 1, 0, 1}
+	dataStructure := NewRankSelectSimple(data)
+	queryRankSecondToLast := dataStructure.RankOfIndex(5)
+	queryRankLast := dataStructure.RankOfIndex(6)
+	querySelectLast, err := dataStructure.IndexWithRank(3)
+
+	if queryRankSecondToLast != 2 {
+		fmt.Println("[TestRankAndIndexOfLast] Error. second-to-last-rank incorrect. Expected ", 2, " Received", queryRankSecondToLast)
+		t.Fail()
+	}
+
+	if queryRankLast != 3 {
+		fmt.Println("[TestRankAndIndexOfLast] Error. last rank incorrect. Expected ", 3, " Received", queryRankLast)
+		t.Fail()
+	}
+
+	if querySelectLast != 6 {
+		fmt.Println("[TestRankAndIndexOfLast] Error. last select incorrect. Expected ", 6, " Received", querySelectLast)
+		t.Fail()
+	}
+
+	if err != nil {
+		fmt.Println("[TestRankAndIndexOfLast] Error. last select gave unexpected error.")
+		t.Fail()
+	}
+
 }

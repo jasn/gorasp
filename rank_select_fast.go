@@ -1,41 +1,82 @@
 package gorasp
 
 import (
+	"errors"
 	"math/bits"
 )
 
 type RankSelectFast struct {
-	packedArray  []uint64
-	partialRanks []uint
-	n            int
+	packedArray    []uint64
+	partialRanks   []uint
+	partialSelects []uint32
+	n              int
 }
 
-func (self *RankSelectFast) IndexWithRank(rank int) int {
-	return 0
+func (self *RankSelectFast) IndexWithRank(rank int) (int, error) {
+	bitIdx := self.partialSelects[rank/64]
+	rankOfIdx := (rank / 64) * 64
+	if rankOfIdx == rank {
+		return int(bitIdx), nil
+	}
+	for i := bitIdx; rankOfIdx != rank && int(i) < self.n; {
+		wordIdx := i / 64
+		word := self.packedArray[wordIdx]
+		onesCount := bits.OnesCount64(word)
+		if rankOfIdx+onesCount <= rank {
+			i += 64
+			rankOfIdx += onesCount
+			if rankOfIdx == rank {
+				if int(i) > self.n {
+					trailingZeros := bits.TrailingZeros64(word)
+					return int(self.n) - trailingZeros, nil
+				}
+				return int(i), nil
+			}
+		} else {
+			offset := selectInWord(word, rank-rankOfIdx)
+			return int(i) + offset, nil
+		}
+	}
+	return -1, errors.New("No element with thank rank.")
+}
+
+func selectInWord(word uint64, rank int) int {
+	rankCurr := int(0)
+	for i := uint(0); i < 64; i += 1 {
+		if rankCurr == rank {
+			return int(i)
+		}
+		bitVal := (word & (1 << i)) >> i
+		rankCurr += int(bitVal)
+	}
+	return 64
 }
 
 func (self *RankSelectFast) computePartialSelects() {
-	selects := make([]uint, self.n+1)
-	sum := uint(0)
-	for i, v := range self.packedArray {
-		if v == 1 {
-			selects[sum] = i + 1
+	allSelects := self.computeAllSelects()
+	self.partialSelects = make([]uint32, computePackedLength(self.n))
+	for i := 0; i < len(allSelects); i += 64 {
+		self.partialSelects[i/64] = allSelects[i]
+	}
+}
+
+func (self *RankSelectFast) computeAllSelects() []uint32 {
+	result := make([]uint32, self.n)
+	result[0] = 0
+	next := int(1)
+	for i, _ := range self.packedArray {
+		for j := 0; j < 64; j += 1 {
+			bitValue := getBit(self.packedArray, i*64+j)
+			if bitValue == 1 {
+				result[next] = uint32(i*64 + j + 1)
+				next = next + 1
+			}
 		}
-		sum += v
 	}
-	for i := sum; i < len(selects); i += 1 {
-		selects[i] = selects[sum]
+	for i := next; i < self.n; i += 1 {
+		result[i] = uint32(self.n)
 	}
-
-	for i, v := range selects[1:] {
-		vPrev := selects[i-1]
-		currBlock := v / 64
-		prevBlock := vPrev / 64
-
-		if currBlock != prevBlock {
-
-		}
-	}
+	return result
 }
 
 func (self *RankSelectFast) RankOfIndex(index int) uint {
@@ -100,6 +141,7 @@ func NewRankSelectFast(array []int) *RankSelectFast {
 	result.packedArray = packedArray
 	result.n = len(array)
 	result.computePartialRanks()
+	result.computePartialSelects()
 	return result
 }
 
