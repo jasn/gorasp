@@ -12,32 +12,41 @@ type RankSelectFast struct {
 	n              int
 }
 
+func (self *RankSelectFast) getWordIndexOfWordWithKthOneBit(k int) (rank, wordIdx int) {
+	bitIdx := self.partialSelects[k/64]
+	tmpWordIdx := bitIdx / 64
+	rankSoFar := int(self.partialRanks[tmpWordIdx])
+	for wordIdx := bitIdx / 64; wordIdx < uint32(len(self.packedArray)); wordIdx++ {
+		word := self.packedArray[wordIdx]
+		onesCount := bits.OnesCount64(word)
+		if rankSoFar+onesCount >= k {
+			return rankSoFar, int(wordIdx)
+		}
+		rankSoFar += onesCount
+	}
+	rank = -1
+	wordIdx = -1
+	return
+}
+
 func (self *RankSelectFast) IndexWithRank(rank int) (int, error) {
 	bitIdx := self.partialSelects[rank/64]
+	if bitIdx == uint32(self.n+1) {
+		return -1, errors.New("No element with thank rank.")
+	}
 	rankOfIdx := (rank / 64) * 64
 	if rankOfIdx == rank {
 		return int(bitIdx), nil
 	}
-	for i := bitIdx; rankOfIdx != rank && int(i) < self.n; {
-		wordIdx := i / 64
-		word := self.packedArray[wordIdx]
-		onesCount := bits.OnesCount64(word)
-		if rankOfIdx+onesCount <= rank {
-			i += 64
-			rankOfIdx += onesCount
-			if rankOfIdx == rank {
-				if int(i) > self.n {
-					trailingZeros := bits.TrailingZeros64(word)
-					return int(self.n) - trailingZeros, nil
-				}
-				return int(i), nil
-			}
-		} else {
-			offset := selectInWord(word, rank-rankOfIdx)
-			return int(i) + offset, nil
-		}
+
+	// find the word that has the 'rank'th 1-bit.
+	rankExcludingWordIdx, wordIdx := self.getWordIndexOfWordWithKthOneBit(rank)
+	if wordIdx == -1 {
+		return -1, errors.New("No element with that rank.")
 	}
-	return -1, errors.New("No element with thank rank.")
+
+	bitOffset := selectInWord(self.packedArray[wordIdx], rank-rankExcludingWordIdx)
+	return wordIdx*64 + bitOffset, nil
 }
 
 func selectInWord(word uint64, rank int) int {
@@ -74,7 +83,7 @@ func (self *RankSelectFast) computeAllSelects() []uint32 {
 		}
 	}
 	for i := next; i < self.n; i += 1 {
-		result[i] = uint32(self.n)
+		result[i] = uint32(self.n + 1)
 	}
 	return result
 }

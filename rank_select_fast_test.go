@@ -2,6 +2,7 @@ package gorasp
 
 import (
 	"fmt"
+	"math/rand"
 	"testing"
 )
 
@@ -136,6 +137,49 @@ func TestLengthComputer(t *testing.T) {
 		actual := computePackedLength(length)
 		if expected != actual {
 			fmt.Printf("Expected %d but received %d", expected, actual)
+			t.Fail()
+		}
+	}
+}
+
+func TestSimpleFastAgreeRandom(t *testing.T) {
+	size := 2048 + 512 + 64 + 16 + 1
+	array := make([]int, size)
+	rand.Seed(42)
+	for i := 0; i < size; i++ {
+		array[i] = rand.Intn(2)
+	}
+
+	fast := NewRankSelectFast(array)
+	simple := NewRankSelectSimple(array)
+
+	for i, _ := range array {
+		rankFast := fast.RankOfIndex(i)
+		rankSimple := simple.RankOfIndex(i)
+		selectFast, errFast := fast.IndexWithRank(i)
+		selectSimple, errSimple := simple.IndexWithRank(i)
+
+		if rankFast != rankSimple {
+			fmt.Println("Fast differs from Simple")
+			fmt.Printf("fast.RankOfIndex(%d) = %d while slow.RankOfIndex(%d) = %d",
+				i, rankFast, i, rankSimple)
+			fmt.Println()
+			t.Fail()
+		}
+
+		if selectFast != selectSimple {
+			fmt.Println("Fast select and Simple select differ (IndexWithRank(", i, "))")
+			fmt.Println("Fast: ", selectFast, "  Simple: ", selectSimple)
+			t.Fail()
+		}
+
+		if errFast == nil && errSimple != nil {
+			fmt.Println("errFast is nil while errSimple is not (IndexWithRank(", i, "))")
+			t.Fail()
+		}
+
+		if errFast != nil && errSimple == nil {
+			fmt.Println("errFast is not nil while errSimple is (IndexWithRank(", i, "))")
 			t.Fail()
 		}
 	}
