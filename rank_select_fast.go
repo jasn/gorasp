@@ -12,6 +12,13 @@ type RankSelectFast struct {
 	n              int
 }
 
+func (self *RankSelectFast) At(index int) int {
+	if index >= self.n {
+		return 0 // return an error or just pretend everything beyond n is 0?
+	}
+	return int(getBit(self.packedArray, index))
+}
+
 func (self *RankSelectFast) getWordIndexOfWordWithKthOneBit(k int) (rank, wordIdx int) {
 	bitIdx := self.partialSelects[k/64]
 	tmpWordIdx := bitIdx / 64

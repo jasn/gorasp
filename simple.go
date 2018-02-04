@@ -8,6 +8,13 @@ type RankSelectSimple struct {
 	array []int
 }
 
+func (self *RankSelectSimple) At(index int) int {
+	if index >= len(self.array) {
+		return 0
+	}
+	return self.array[index]
+}
+
 func NewRankSelectSimple(array []int) *RankSelectSimple {
 	obj := new(RankSelectSimple)
 	obj.array = array
