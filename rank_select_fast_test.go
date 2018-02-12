@@ -184,3 +184,18 @@ func TestSimpleFastAgreeRandom(t *testing.T) {
 		}
 	}
 }
+
+func TestACase(t *testing.T) {
+	// array has length 64
+	array := []int{0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1}
+	fast := NewRankSelectFast(array)
+	simple := NewRankSelectSimple(array)
+
+	fastRes := fast.RankOfIndex(64)
+	simpleRes := simple.RankOfIndex(64)
+
+	if fastRes != simpleRes {
+		fmt.Println("error: fast and simple disagree")
+		t.Fail()
+	}
+}

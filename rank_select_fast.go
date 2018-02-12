@@ -96,6 +96,11 @@ func (self *RankSelectFast) computeAllSelects() []uint32 {
 }
 
 func (self *RankSelectFast) RankOfIndex(index int) uint {
+	if index >= self.n {
+		lastPartial := self.partialRanks[len(self.partialRanks)-1]
+		lastWord := self.packedArray[len(self.packedArray)-1]
+		return lastPartial + uint(bits.OnesCount64(lastWord))
+	}
 	partialRank := self.partialRanks[index/64]
 
 	if index%64 == 0 {
