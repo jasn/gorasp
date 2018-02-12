@@ -199,3 +199,11 @@ func TestACase(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestSingleOne(t *testing.T) {
+	array := []int{1}
+	fast := NewRankSelectFast(array)
+
+	fastRes := fast.RankOfIndex(1)
+	fmt.Println(fastRes)
+}

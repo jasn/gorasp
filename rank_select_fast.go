@@ -79,6 +79,9 @@ func (self *RankSelectFast) computePartialSelects() {
 func (self *RankSelectFast) computeAllSelects() []uint32 {
 	result := make([]uint32, self.n)
 	result[0] = 0
+	if self.n == 1 {
+		return result
+	}
 	next := int(1)
 	for i, _ := range self.packedArray {
 		for j := 0; j < 64; j += 1 {
