@@ -71,17 +71,14 @@ func selectInWord(word uint64, rank int) int {
 func (self *RankSelectFast) computePartialSelects() {
 	allSelects := self.computeAllSelects()
 	self.partialSelects = make([]uint32, computePackedLength(self.n))
-	for i := 0; i < len(allSelects); i += 64 {
+	for i := 0; i < self.n; i += 64 {
 		self.partialSelects[i/64] = allSelects[i]
 	}
 }
 
 func (self *RankSelectFast) computeAllSelects() []uint32 {
-	result := make([]uint32, self.n)
+	result := make([]uint32, self.n+1)
 	result[0] = 0
-	if self.n == 1 {
-		return result
-	}
 	next := int(1)
 	for i, _ := range self.packedArray {
 		for j := 0; j < 64; j += 1 {

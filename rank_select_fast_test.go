@@ -205,5 +205,30 @@ func TestSingleOne(t *testing.T) {
 	fast := NewRankSelectFast(array)
 
 	fastRes := fast.RankOfIndex(1)
-	fmt.Println(fastRes)
+	if fastRes != 1 {
+		t.Fail()
+	}
+}
+
+func TestTwoOnes(t *testing.T) {
+	array := []int{1, 1}
+	fast := NewRankSelectFast(array)
+
+	fastRes := fast.RankOfIndex(1)
+	if fastRes != 1 {
+		t.Fail()
+	}
+}
+
+func TestManyOnes(t *testing.T) {
+	array := make([]int, 1234)
+	for i := range array {
+		array[i] = 1
+	}
+	fast := NewRankSelectFast(array)
+
+	fastRes := fast.RankOfIndex(1)
+	if fastRes != 1 {
+		t.Fail()
+	}
 }
