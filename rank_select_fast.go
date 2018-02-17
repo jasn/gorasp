@@ -5,6 +5,7 @@ import (
 	"math/bits"
 )
 
+// struct that will implement the RankSelect interface.
 type RankSelectFast struct {
 	packedArray    []uint64
 	partialRanks   []uint
@@ -56,6 +57,7 @@ func (self *RankSelectFast) IndexWithRank(rank int) (int, error) {
 	return wordIdx*64 + bitOffset, nil
 }
 
+// find the first bit in word with rank ones before it.
 func selectInWord(word uint64, rank int) int {
 	rankCurr := int(0)
 	for i := uint(0); i < 64; i += 1 {
@@ -68,6 +70,8 @@ func selectInWord(word uint64, rank int) int {
 	return 64
 }
 
+// helper method to build the lookup table used when answer select(i) queries.
+// This function comptues the table select(i) for i = 64k, k = 0..n/64
 func (self *RankSelectFast) computePartialSelects() {
 	allSelects := self.computeAllSelects()
 	self.partialSelects = make([]uint32, computePackedLength(self.n))
@@ -76,6 +80,8 @@ func (self *RankSelectFast) computePartialSelects() {
 	}
 }
 
+// helper method to build the lookup table used when answer select(i) queries.
+// this function computes the table select(i) for 0 <= i <= n.
 func (self *RankSelectFast) computeAllSelects() []uint32 {
 	result := make([]uint32, self.n+1)
 	result[0] = 0
@@ -114,6 +120,7 @@ func (self *RankSelectFast) RankOfIndex(index int) uint {
 	return partialRank + uint(bits.OnesCount64(word&mask))
 }
 
+// helper method for building the lookup tables used when answering rank(i) queries.
 func (self *RankSelectFast) computePartialRanks() {
 	self.partialRanks = make([]uint, computePackedLength(self.n))
 	sum := uint(0)
@@ -126,6 +133,8 @@ func (self *RankSelectFast) computePartialRanks() {
 	}
 }
 
+// helper method for accessing individual bits in a 'packed array'
+// index refers to the bit-index, i.e. the first word stores bits for indices 0-63.
 func getBit(array []uint64, index int) uint {
 	wordIndex := index / 64
 	bitIndex := index % 64
@@ -137,6 +146,8 @@ func getBit(array []uint64, index int) uint {
 	return val
 }
 
+// helper method for setting bits in a packed array.
+// index refers to the bit-index, i.e. the first word stores bits for indices 0-63.
 func setBit(array []uint64, index, value int) {
 	wordIndex := index / 64
 	bitIndex := index % 64
@@ -152,6 +163,9 @@ func setBit(array []uint64, index, value int) {
 	array[wordIndex] = word
 }
 
+// constructor for RankSelectFast.
+// this function computes all the necessary tables, so the structure is ready for querying when this returns.
+// array is not a packed array, i.e. every bit is in its own int.
 func NewRankSelectFast(array []int) *RankSelectFast {
 	result := new(RankSelectFast)
 	packedArrayLength := computePackedLength(len(array))
