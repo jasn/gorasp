@@ -7,8 +7,8 @@ Additionally we also need to be able to retrieve the i'th bit.
 After defining what rank and select is, it will become apparant that this is a static data structuring problem, i.e. the bits do not change.
 There is also research on maintaining a bit array dynamically and supporting these operations, but we do not deal with that here.
 
-Rank(i): return the number of 1-bits to the left of the i'th bit.
-Select(i): return the lowest index j where rank(j) = i.
+* `RankOfIndex(i)`: Called Rank in the literature. return the number of 1-bits to the left of the i'th bit.
+* `IndexWithRank(i)`: Called Select in the literature. return the lowest index j where RankOfIndex(j) = i.
 
 In the research literature there are solutions that store n bits + o(n) bits, i.e. a lower order term, while supporting the operations in constant time.
 
